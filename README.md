@@ -1,8 +1,27 @@
-# CLI Proxy API
+# CLI Proxy API (ZZ Fork)
 
 English | [中文](README_CN.md)
 
+> **This is a fork of [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) with additional features and fixes.**
+
 A proxy server that provides OpenAI/Gemini/Claude/Codex compatible API interfaces for CLI.
+
+## Fork Improvements
+
+This fork includes the following enhancements over the upstream version:
+
+### Image Model Variants Generation
+- **Fixed**: Support for `gemini-3-pro-image` base model (upstream only supported `gemini-3-pro-image-preview`)
+- **Added**: Automatic generation of 36+ image model variants including:
+  - **Aspect ratios**: `1-1`, `16-9`, `9-16`, `3-2`, `2-3`, `4-3`, `3-4`, `21-9`
+  - **Sizes**: `1k`, `2k`, `4k`
+  - **Combined variants**: `gemini-3-pro-image-4k-16-9`, `gemini-3-pro-image-2k-9-16`, etc.
+
+### Files Modified
+- `internal/registry/model_registry.go` - Extended base model detection for variant generation
+- `internal/util/image_suffix.go` - Removed forced `-preview` suffix conversion
+
+---
 
 It now also supports OpenAI Codex (GPT models) and Claude Code via OAuth.
 
