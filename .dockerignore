@@ -19,7 +19,7 @@ LICENSE
 auths/*
 logs/*
 conv/*
-config.yaml
+# config.yaml  ← 注释掉以支持 Zeabur 部署，生产环境请取消注释此行
 
 # Development/editor
 bin/*
