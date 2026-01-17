@@ -32,9 +32,3 @@ jobs:
           git checkout main
           git merge upstream/main --no-edit
           git push origin main
-
-      - name: Rebase feature branch
-        run: |
-          git checkout feature/gemini-image-gen
-          git rebase main
-          git push origin feature/gemini-image-gen --force-with-lease
