@@ -142,6 +142,7 @@ func (e *AntigravityExecutor) Execute(ctx context.Context, auth *cliproxyauth.Au
 		return resp, err
 	}
 
+	translated = util.ApplyImageConfigFromMetadataCLI(req.Model, req.Metadata, translated)
 	translated = applyPayloadConfigWithRoot(e.cfg, baseModel, "antigravity", "request", translated, originalTranslated)
 
 	baseURLs := antigravityBaseURLFallbackOrder(auth)
@@ -627,6 +628,7 @@ func (e *AntigravityExecutor) ExecuteStream(ctx context.Context, auth *cliproxya
 		return nil, err
 	}
 
+	translated = util.ApplyImageConfigFromMetadataCLI(req.Model, req.Metadata, translated)
 	translated = applyPayloadConfigWithRoot(e.cfg, baseModel, "antigravity", "request", translated, originalTranslated)
 
 	baseURLs := antigravityBaseURLFallbackOrder(auth)

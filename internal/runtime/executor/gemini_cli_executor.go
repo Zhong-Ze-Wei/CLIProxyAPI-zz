@@ -128,6 +128,7 @@ func (e *GeminiCLIExecutor) Execute(ctx context.Context, auth *cliproxyauth.Auth
 		return resp, err
 	}
 
+	basePayload = util.ApplyImageConfigFromMetadataCLI(req.Model, req.Metadata, basePayload)
 	basePayload = fixGeminiCLIImageAspectRatio(baseModel, basePayload)
 	basePayload = applyPayloadConfigWithRoot(e.cfg, baseModel, "gemini", "request", basePayload, originalTranslated)
 
@@ -277,6 +278,7 @@ func (e *GeminiCLIExecutor) ExecuteStream(ctx context.Context, auth *cliproxyaut
 		return nil, err
 	}
 
+	basePayload = util.ApplyImageConfigFromMetadataCLI(req.Model, req.Metadata, basePayload)
 	basePayload = fixGeminiCLIImageAspectRatio(baseModel, basePayload)
 	basePayload = applyPayloadConfigWithRoot(e.cfg, baseModel, "gemini", "request", basePayload, originalTranslated)
 

@@ -721,7 +721,101 @@ func (r *ModelRegistry) GetAvailableModels(handlerType string) []map[string]any 
 		}
 	}
 
+	// Add image model variants for gemini-3-pro-image-preview
+	models = r.addImageModelVariants(models, handlerType)
+
 	return models
+}
+
+// addImageModelVariants adds image model variants to the models list if the base image model exists.
+// It generates all combinations of aspect ratios and image sizes for gemini-3-pro-image-preview.
+func (r *ModelRegistry) addImageModelVariants(models []map[string]any, handlerType string) []map[string]any {
+	// Check if gemini-3-pro-image-preview exists in the current models list
+	hasImageModel := false
+	var baseModel map[string]any
+	for _, model := range models {
+		if id, ok := model["id"].(string); ok && id == "gemini-3-pro-image-preview" {
+			hasImageModel = true
+			baseModel = model
+			break
+		}
+	}
+
+	// Only add variants if the base image model exists
+	if !hasImageModel || baseModel == nil {
+		return models
+	}
+
+	// Generate all variant names internally (avoiding circular import with util)
+	variants := r.generateImageModelVariants()
+
+	// Add each variant to the models list
+	for _, variant := range variants {
+		// Skip the base model as it's already in the list
+		if variant == "gemini-3-pro-image-preview" {
+			continue
+		}
+
+		// Create a copy of the base model with the variant ID
+		variantModel := make(map[string]any)
+		for k, v := range baseModel {
+			variantModel[k] = v
+		}
+		variantModel["id"] = variant
+
+		// Update display_name to show the configuration
+		if displayName, ok := baseModel["display_name"].(string); ok {
+			variantModel["display_name"] = displayName + " (" + variant + ")"
+		} else {
+			variantModel["display_name"] = variant
+		}
+
+		models = append(models, variantModel)
+	}
+
+	return models
+}
+
+// generateImageModelVariants returns all image model variant names.
+// It generates combinations of aspect ratios and image sizes for gemini-3-pro-image-preview.
+func (r *ModelRegistry) generateImageModelVariants() []string {
+	aspectRatios := []string{
+		"1-1",   // 1:1 square
+		"16-9",  // 16:9 widescreen
+		"9-16",  // 9:16 portrait
+		"21-9",  // 21:9 ultrawide
+		"4-3",   // 4:3 standard
+		"3-4",   // 3:4 portrait standard
+		"3-2",   // 3:2 photo landscape
+		"2-3",   // 2:3 photo portrait
+	}
+
+	imageSizes := []string{
+		"1k", // 1K resolution
+		"2k", // 2K resolution
+		"4k", // 4K resolution
+	}
+
+	variants := []string{"gemini-3-pro-image-preview"}
+
+	// Add models with only aspect ratio (no size suffix)
+	for _, ar := range aspectRatios {
+		variants = append(variants, "gemini-3-pro-image-preview-"+ar)
+	}
+
+	// Add models with only image size (no aspect ratio suffix)
+	for _, size := range imageSizes {
+		variants = append(variants, "gemini-3-pro-image-preview-"+size)
+	}
+
+	// Add combined variants (aspect ratio + image size)
+	for _, ar := range aspectRatios {
+		for _, size := range imageSizes {
+			variants = append(variants, "gemini-3-pro-image-preview-"+size+"-"+ar)
+		}
+	}
+
+	return variants
 }
 
 // GetAvailableModelsByProvider returns models available for the given provider identifier.
