@@ -1,0 +1,15 @@
+port: 8317
+
+# 建议保持默认，官方教程也是这样写的
+auth-dir: "~/.cli-proxy-api"
+
+request-retry: 3
+
+quota-exceeded:
+  switch-project: true
+  switch-preview-model: true
+
+api-keys:
+  # 这是你自己服务对外暴露的“访问密钥”，不是上游模型的 Key
+  # 先随便写一个占位，正式用的时候记得换掉并当成机密来处理
+  - "CHANGE-ME-CLIProxyAPI-KEY"
