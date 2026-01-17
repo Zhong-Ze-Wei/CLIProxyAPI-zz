@@ -730,14 +730,19 @@ func (r *ModelRegistry) GetAvailableModels(handlerType string) []map[string]any 
 // addImageModelVariants adds image model variants to the models list if the base image model exists.
 // It generates all combinations of aspect ratios and image sizes for gemini-3-pro-image-preview.
 func (r *ModelRegistry) addImageModelVariants(models []map[string]any, handlerType string) []map[string]any {
-	// Check if gemini-3-pro-image-preview exists in the current models list
+	// Check if gemini-3-pro-image or gemini-3-pro-image-preview exists in the current models list
 	hasImageModel := false
 	var baseModel map[string]any
+	var baseModelName string
 	for _, model := range models {
-		if id, ok := model["id"].(string); ok && id == "gemini-3-pro-image-preview" {
-			hasImageModel = true
-			baseModel = model
-			break
+		if id, ok := model["id"].(string); ok {
+			// Support both gemini-3-pro-image and gemini-3-pro-image-preview
+			if id == "gemini-3-pro-image" || id == "gemini-3-pro-image-preview" {
+				hasImageModel = true
+				baseModel = model
+				baseModelName = id
+				break
+			}
 		}
 	}
 
@@ -746,13 +751,13 @@ func (r *ModelRegistry) addImageModelVariants(models []map[string]any, handlerTy
 		return models
 	}
 
-	// Generate all variant names internally (avoiding circular import with util)
-	variants := r.generateImageModelVariants()
+	// Generate all variant names using the detected base model name
+	variants := r.generateImageModelVariantsForBase(baseModelName)
 
 	// Add each variant to the models list
 	for _, variant := range variants {
 		// Skip the base model as it's already in the list
-		if variant == "gemini-3-pro-image-preview" {
+		if variant == baseModelName {
 			continue
 		}
 
@@ -776,9 +781,9 @@ func (r *ModelRegistry) addImageModelVariants(models []map[string]any, handlerTy
 	return models
 }
 
-// generateImageModelVariants returns all image model variant names.
-// It generates combinations of aspect ratios and image sizes for gemini-3-pro-image-preview.
-func (r *ModelRegistry) generateImageModelVariants() []string {
+// generateImageModelVariantsForBase returns all image model variant names for the given base model.
+// It generates combinations of aspect ratios and image sizes.
+func (r *ModelRegistry) generateImageModelVariantsForBase(baseModel string) []string {
 	aspectRatios := []string{
 		"1-1",   // 1:1 square
 		"16-9",  // 16:9 widescreen
@@ -796,26 +801,32 @@ func (r *ModelRegistry) generateImageModelVariants() []string {
 		"4k", // 4K resolution
 	}
 
-	variants := []string{"gemini-3-pro-image-preview"}
+	variants := []string{baseModel}
 
 	// Add models with only aspect ratio (no size suffix)
 	for _, ar := range aspectRatios {
-		variants = append(variants, "gemini-3-pro-image-preview-"+ar)
+		variants = append(variants, baseModel+"-"+ar)
 	}
 
 	// Add models with only image size (no aspect ratio suffix)
 	for _, size := range imageSizes {
-		variants = append(variants, "gemini-3-pro-image-preview-"+size)
+		variants = append(variants, baseModel+"-"+size)
 	}
 
 	// Add combined variants (aspect ratio + image size)
 	for _, ar := range aspectRatios {
 		for _, size := range imageSizes {
-			variants = append(variants, "gemini-3-pro-image-preview-"+size+"-"+ar)
+			variants = append(variants, baseModel+"-"+size+"-"+ar)
 		}
 	}
 
 	return variants
+}
+
+// generateImageModelVariants returns all image model variant names (legacy, for compatibility).
+// It generates combinations of aspect ratios and image sizes for gemini-3-pro-image-preview.
+func (r *ModelRegistry) generateImageModelVariants() []string {
+	return r.generateImageModelVariantsForBase("gemini-3-pro-image-preview")
 }
 
 // GetAvailableModelsByProvider returns models available for the given provider identifier.

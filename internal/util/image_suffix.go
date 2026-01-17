@@ -146,10 +146,8 @@ func parseImageSuffix(modelName string) (base, aspectRatio, imageSize string) {
 		return modelName, "", ""
 	}
 
-	// Normalize base model to preview variant
-	if base == "gemini-3-pro-image" {
-		base = "gemini-3-pro-image-preview"
-	}
+	// Keep the base model name as-is (don't force -preview suffix)
+	// The upstream may return either gemini-3-pro-image or gemini-3-pro-image-preview
 
 	return base, aspectRatio, imageSize
 }
