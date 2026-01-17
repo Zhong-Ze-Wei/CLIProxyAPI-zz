@@ -633,26 +633,16 @@ func cloneBytes(src []byte) []byte {
 }
 
 func normalizeModelMetadata(modelName string) (string, map[string]any) {
-	// 1. Thinking 后缀解析
-	normalizedModel, metadata := util.NormalizeThinkingModel(modelName)
-
-	// 2. 图像后缀解析（如果是图像模型）
-	if strings.Contains(strings.ToLower(normalizedModel), "gemini-3-pro-image") {
-		baseModel, imageMetadata := util.NormalizeImageModel(normalizedModel)
+	// 图像后缀解析（如果是图像模型）
+	// 注意：thinking 后缀现在由 internal/thinking 包在 executor 层处理
+	if strings.Contains(strings.ToLower(modelName), "gemini-3-pro-image") {
+		baseModel, imageMetadata := util.NormalizeImageModel(modelName)
 		if imageMetadata != nil {
-			normalizedModel = baseModel
-			// 合并 metadata
-			if metadata == nil {
-				metadata = imageMetadata
-			} else {
-				for k, v := range imageMetadata {
-					metadata[k] = v
-				}
-			}
+			return baseModel, imageMetadata
 		}
 	}
 
-	return normalizedModel, metadata
+	return modelName, nil
 }
 
 func cloneMetadata(src map[string]any) map[string]any {
