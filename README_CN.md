@@ -1,8 +1,27 @@
-# CLI 代理 API
+# CLI 代理 API (ZZ Fork)
 
 [English](README.md) | 中文
 
+> **这是 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 的 Fork 版本，包含额外的功能和修复。**
+
 一个为 CLI 提供 OpenAI/Gemini/Claude/Codex 兼容 API 接口的代理服务器。
+
+## Fork 改进内容
+
+本 Fork 相比上游版本包含以下增强：
+
+### 图像模型变体生成
+- **修复**：支持 `gemini-3-pro-image` 作为基础模型（上游仅支持 `gemini-3-pro-image-preview`）
+- **新增**：自动生成 36+ 图像模型变体，包括：
+  - **宽高比**：`1-1`、`16-9`、`9-16`、`3-2`、`2-3`、`4-3`、`3-4`、`21-9`
+  - **分辨率**：`1k`、`2k`、`4k`
+  - **组合变体**：`gemini-3-pro-image-4k-16-9`、`gemini-3-pro-image-2k-9-16` 等
+
+### 修改的文件
+- `internal/registry/model_registry.go` - 扩展基础模型检测以支持变体生成
+- `internal/util/image_suffix.go` - 移除强制 `-preview` 后缀转换
+
+---
 
 现已支持通过 OAuth 登录接入 OpenAI Codex（GPT 系列）和 Claude Code。
 
